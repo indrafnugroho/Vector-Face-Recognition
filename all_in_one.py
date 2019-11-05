@@ -2,11 +2,10 @@ import cv2
 import numpy as np
 import scipy
 from scipy.misc import imread
-import pickle
+import cPickle as pickle
 import random
 import os
 import matplotlib.pyplot as plt
-from pathlib import Path
 
 # Feature extractor
 def extract_features(image_path, vector_size=32):
@@ -33,7 +32,7 @@ def extract_features(image_path, vector_size=32):
             # end of our feature vector
             dsc = np.concatenate([dsc, np.zeros(needed_size - dsc.size)])
     except cv2.error as e:
-        print ('Error: '), e
+        print ('Error: ', e)
         return None
 
     return dsc
@@ -44,19 +43,18 @@ def batch_extractor(images_path, pickled_db_path="features.pck"):
 
     result = {}
     for f in files:
+        print ('Extracting features from image %s' % f)
         name = f.split('/')[-1].lower()
         result[name] = extract_features(f)
     
     # saving all our feature vectors in pickled file
-    with open(pickled_db_path, 'wb') as fp:
+    with open(pickled_db_path, 'w') as fp:
         pickle.dump(result, fp)
-
-## SEPARATOR ##
 
 class Matcher(object):
 
     def __init__(self, pickled_db_path="features.pck"):
-        with open(pickled_db_path, encoding = 'utf-8') as fp:
+        with open(pickled_db_path) as fp:
             self.data = pickle.load(fp)
         self.names = []
         self.matrix = []
@@ -80,16 +78,13 @@ class Matcher(object):
 
         return nearest_img_paths, img_distances[nearest_ids].tolist()
 
-
-## SEPARATOR ##
-
 def show_img(path):
     img = imread(path, mode="RGB")
     plt.imshow(img)
     plt.show()
     
 def run():
-    images_path = 'database'
+    images_path = '../resources/images/'
     files = [os.path.join(images_path, p) for p in sorted(os.listdir(images_path))]
     # getting 3 random images 
     sample = random.sample(files, 3)
@@ -99,14 +94,14 @@ def run():
     ma = Matcher('features.pck')
     
     for s in sample:
-        print ('Query image ==========================================')
+        print('Query image ==========================================')
         show_img(s)
         names, match = ma.match(s, topn=3)
-        print ('Result images ========================================')
+        print('Result images ========================================')
         for i in range(3):
             # we got cosine distance, less cosine distance between vectors
             # more they similar, thus we subtruct it from 1 to get match value
-            print ('Match %s') % (1-match[i])
+            print('Match %s' % (1-match[i]))
             show_img(os.path.join(images_path, names[i]))
 
 run()
