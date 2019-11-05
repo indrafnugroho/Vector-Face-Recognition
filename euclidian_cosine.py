@@ -26,8 +26,3 @@ def cosine_similarity(v1, v2) :
     normv2 = norm(v2)
     cos = dot / (normv1*normv2)
     return cos
-
-a = [1,2,3]
-b = [1,1,4]
-
-print("Cosine similarity is ", cosine_similarity(a,b))
