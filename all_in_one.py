@@ -110,7 +110,7 @@ def show_img(path):
     plt.show()
     
 def run():
-    images_path = 'images/references/'
+    images_path = 'C:/Users/ASUS/Documents/Latihan/images/references/'
     files = [os.path.join('images/test/', p) for p in sorted(os.listdir('images/test/'))]
     # getting 3 random images
     #print(files)
@@ -121,7 +121,7 @@ def run():
     print("2. Cosine Similarity")
     option = int(input(">> "))
     
-    batch_extractor(images_path)
+    """batch_extractor(images_path)"""
 
     ma = Matcher('references.pck')
 
@@ -134,10 +134,11 @@ def run():
         names, match = ma.match(s, option, topn)
         print('Result images ========================================')
         for i in range(topn):
+            names[i] = os.path.join(images_path, names[i])
             if (option==1) :
                 print('Match %s' % (1 - 0.1*match[i]))
             elif (option==2) :
                 print('Match %s' % (match[i]))
-            show_img(os.path.join(images_path, names[i]))
+            show_img(names[i])
 
 run()
