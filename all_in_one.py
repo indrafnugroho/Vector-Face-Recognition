@@ -40,7 +40,7 @@ def extract_features(image_path, vector_size=32):
     return dsc
 
 
-def batch_extractor(images_path, pickled_db_path="reference.pck"):
+def batch_extractor(images_path, pickled_db_path="references.pck"):
     files = [os.path.join(images_path, p) for p in sorted(os.listdir(images_path))]
 
     result = {}
@@ -55,7 +55,7 @@ def batch_extractor(images_path, pickled_db_path="reference.pck"):
 
 class Matcher(object):
 
-    def __init__(self, pickled_db_path="features.pck"):
+    def __init__(self, pickled_db_path="references.pck"):
         with open(pickled_db_path, 'rb') as fp:
             self.data = pickle.load(fp)
         self.names = []
@@ -87,14 +87,14 @@ class Matcher(object):
         v = vector.reshape(1, -1)
         return scipy.spatial.distance.cdist(self.matrix, v, 'cosine').reshape(-1)"""
 
-    def match(self, image_path, option, topn=5):
+    def match(self, image_path, option, topn):
         features = extract_features(image_path)
         if (option==1) :
             img_distances = self.euclidian_distance(features)
         elif (option==2) :
             img_distances = self.cosine_similarity(features)
         
-        # getting top 5 records
+        # getting top n records
         if (option==1) :
             nearest_ids = np.argsort(img_distances)[:topn].tolist()
         elif (option==2) :
@@ -110,29 +110,32 @@ def show_img(path):
     plt.show()
     
 def run():
-    images_path = 'images/reference/'
+    images_path = 'images/references/'
     files = [os.path.join('images/test/', p) for p in sorted(os.listdir('images/test/'))]
     # getting 3 random images
     #print(files)
     sample = random.sample(files, 3)
 
-    print("What metode would you wanna choose? Input your answer in number.")
+    print("What method would you wanna choose? Input your answer in number.")
     print("1. Euclidian Distance")
     print("2. Cosine Similarity")
     option = int(input(">> "))
     
     batch_extractor(images_path)
 
-    ma = Matcher('reference.pck')
+    ma = Matcher('references.pck')
+
+    print("How many pictures would you like to show?")
+    topn = int(input(">> "))
     
     for s in sample:
         print('Query image ==========================================')
         show_img(s)
-        names, match = ma.match(s, option, topn=3)
+        names, match = ma.match(s, option, topn)
         print('Result images ========================================')
-        for i in range(3):
+        for i in range(topn):
             if (option==1) :
-                print('Match %s' % (1 - match[i]))
+                print('Match %s' % (1 - 0.1*match[i]))
             elif (option==2) :
                 print('Match %s' % (match[i]))
             show_img(os.path.join(images_path, names[i]))
