@@ -123,9 +123,8 @@ class Matcher(object):
                 distance[i][j] = (np.dot(self.matrix[i],v[j]) / (np.linalg.norm(self.matrix[i]) * np.linalg.norm(v[j])))
         return distance.reshape(-1)
     
-    def match(self, image_path, option, topn=5):
+    def match(self, image_path, option, topn):
         features = extract_features(image_path)
-        # getting top 5 records
         if (option==1) :
             img_distances = self.euclidian_distance(features)
             nearest_ids = np.argsort(img_distances)[:topn].tolist()
@@ -135,13 +134,6 @@ class Matcher(object):
         nearest_img_paths = self.names[nearest_ids].tolist()
 
         return nearest_img_paths, img_distances[nearest_ids].tolist()
-
-def main():
-    app = QtWidgets.QApplication(sys.argv)
-    application = ApplicationWindow()
-    application.show()
-
-    sys.exit(app.exec_())
 
 def extract_features(image_path, vector_size=32):
     image = imageio.imread(image_path, pilmode="RGB")
@@ -171,5 +163,12 @@ def batch_extractor(images_path, pickled_db_path="reference.pck"):
     with open(pickled_db_path, 'wb') as fp:
         pickle.dump(result, fp)
     
+def main():
+    app = QtWidgets.QApplication(sys.argv)
+    application = ApplicationWindow()
+    application.show()
+
+    sys.exit(app.exec_())
+
 if __name__ == "__main__":
     main()
