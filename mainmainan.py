@@ -12,8 +12,6 @@ import os
 import matplotlib.pyplot as plt
 import math
 
-
-
 class ApplicationWindow(QtWidgets.QMainWindow):
     def __init__(self):
         super(ApplicationWindow, self).__init__()
@@ -21,53 +19,87 @@ class ApplicationWindow(QtWidgets.QMainWindow):
 
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
+
         self.ui.tombolLoad.clicked.connect(lambda: self.loadkiri())
         self.ui.gambar.setPixmap(QtGui.QPixmap("a.png"))    
         self.ui.tombolCosi.toggled.connect(lambda: self.choose())
         self.ui.tombolEuc.toggled.connect(lambda: self.choose())
         self.ui.gambar2.setPixmap(QtGui.QPixmap("a.png"))
         self.ui.tombolNext.setIcon(QtGui.QIcon("next.png"))
+        self.ui.tombolPrev.setIcon(QtGui.QIcon("prev.png"))
 
-        self.ui.tombolFind.clicked.connect(lambda: self.find(self.option, self.num))
+        self.ui.tombolFind.clicked.connect(lambda: self.find())
+        self.ui.tombolFind.clicked.connect(lambda: self.loadkanan())
         
+        self.ui.tombolNext.clicked.connect(lambda: self.nextnext())
+        
+        self.ui.tombolPrev.clicked.connect(lambda: self.prevprev())
+
         self.ui.spinBox.valueChanged.connect(lambda: self.count())
+
     def loadkiri(self):
         loader = QtWidgets.QFileDialog()
         self.name, _ = loader.getOpenFileName()
         self.ui.gambar.setPixmap(QtGui.QPixmap(self.name))
-    
+
+    def loadkanan(self):
+        loader = QtWidgets.QFileDialog()
+        self.ui.gambar2.setPixmap(QtGui.QPixmap(self.names_arr[0]))
+        if (self.option==1) :
+            self.ui.similarity.setText('Match %s%%' % round((1 - 0.1*self.match[self.iterate])*100,4))
+        elif (self.option==2) :
+            self.ui.similarity.setText('Match %s%%' % round(self.match[self.iterate]*100,4))
+        
     def nextSlide(self):
         if self.ui.tombolNext.clicked()==True:
             self.ui.gambar2.setPixmap(QtGui.QPixmap([self]))
 
     def count(self):
         self.num = self.ui.spinBox.value()
+
     def choose(self):
         if self.ui.tombolCosi.isChecked()==True:
             self.option = 1
         if self.ui.tombolEuc.isChecked()==True:
             self.option = 2
             
-    def find(self, option, topn):
+    def find(self):
         images_path = 'images/references/'
         files = [self.name]
     
         ma = Matcher('references.pck')
+        self.iterate = 0
+        
         for s in files:
-            print('Query image ==========================================')
-            names, match = ma.match(s, option, topn)
-            print('Result images ========================================')
-            for i in range(topn):
-                names[i] = os.path.join(images_path, names[i])
-                if (option==1) :
-                    print('Match %s%%' % round((1 - 0.1*match[i])*100,4))
-                elif (option==2) :
-                    print('Match %s%%' % round(match[i]*100,4))
-                show_img(names[i])
+            self.names_pic, self.match = ma.match(s, self.option, self.num)
+            self.names_arr = ["" for i in range(self.num)]
+            self.names_arr[self.iterate] = os.path.join(images_path, self.names_pic[self.iterate])
+       
+    def nextnext(self) :
+        images_path = 'images/references/'
+        self.iterate += 1
+        if (self.iterate == self.num) :
+            self.iterate = 0
+        self.names_arr[self.iterate] = os.path.join(images_path, self.names_pic[self.iterate])
+        self.ui.gambar2.setPixmap(QtGui.QPixmap(self.names_arr[self.iterate]))
+        if (self.option==1) :
+            self.ui.similarity.setText('Match %s%%' % round((1 - 0.1*self.match[self.iterate])*100,4))
+        elif (self.option==2) :
+            self.ui.similarity.setText('Match %s%%' % round(self.match[self.iterate]*100,4))
 
+    def prevprev(self) :
+        images_path = 'images/references/'
+        self.iterate -= 1
+        if (self.iterate == -1) :
+            self.iterate = self.num-1
+        self.names_arr[self.iterate] = os.path.join(images_path, self.names_pic[self.iterate])
+        self.ui.gambar2.setPixmap(QtGui.QPixmap(self.names_arr[self.iterate]))
+        if (self.option==1) :
+            self.ui.similarity.setText('Match %s%%' % round((1 - 0.1*self.match[self.iterate])*100,4))
+        elif (self.option==2) :
+            self.ui.similarity.setText('Match %s%%' % round(self.match[self.iterate]*100,4))
 
 class Matcher(object):
-
     def __init__(self, pickled_db_path="references.pck"):
         with open(pickled_db_path, 'rb') as fp:
             self.data = pickle.load(fp)
@@ -115,37 +147,21 @@ def main():
 
     sys.exit(app.exec_())
 
-
-# Feature extractor
 def extract_features(image_path, vector_size=32):
     image = imageio.imread(image_path, pilmode="RGB")
     try:
-        # Using KAZE, cause SIFT, ORB and other was moved to additional module
-        # which is adding addtional pain during install
         alg = cv2.KAZE_create()
-        # Dinding image keypoints
         kps = alg.detect(image)
-        # Getting first 32 of them. 
-        # Number of keypoints is varies depend on image size and color pallet
-        # Sorting them based on keypoint response value(bigger is better)
         kps = sorted(kps, key=lambda x: -x.response)[:vector_size]
-        # computing descriptors vector
         kps, dsc = alg.compute(image, kps)
-        # Flatten all of them in one big vector - our feature vector
         dsc = dsc.flatten()
-        # Making descriptor of same size
-        # Descriptor vector size is 64
         needed_size = (vector_size * 64)
         if dsc.size < needed_size:
-            # if we have less the 32 descriptors then just adding zeros at the
-            # end of our feature vector
             dsc = np.concatenate([dsc, np.zeros(needed_size - dsc.size)])
     except cv2.error as e:
         print ('Error: ', e)
         return None
-
     return dsc
-
 
 def batch_extractor(images_path, pickled_db_path="reference.pck"):
     files = [os.path.join(images_path, p) for p in sorted(os.listdir(images_path))]
@@ -156,15 +172,8 @@ def batch_extractor(images_path, pickled_db_path="reference.pck"):
         name = f.split('/')[-1].lower()
         result[name] = extract_features(f)
     
-    # saving all our feature vectors in pickled file
     with open(pickled_db_path, 'wb') as fp:
         pickle.dump(result, fp)
-
-def show_img(path):
-    img = imageio.imread(path, pilmode="RGB")
-    plt.imshow(img)
-    plt.show()
     
-
 if __name__ == "__main__":
     main()

@@ -103,8 +103,8 @@
    <widget class="QPushButton" name="tombolNext">
     <property name="geometry">
      <rect>
-      <x>490</x>
-      <y>400</y>
+      <x>570</x>
+      <y>470</y>
       <width>60</width>
       <height>60</height>
      </rect>
@@ -177,13 +177,39 @@
      <string>Image(s)</string>
     </property>
    </widget>
+   <widget class="QPushButton" name="tombolPrev">
+    <property name="geometry">
+     <rect>
+      <x>410</x>
+      <y>470</y>
+      <width>60</width>
+      <height>60</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+   </widget>
+   <widget class="QLabel" name="similarity">
+    <property name="geometry">
+     <rect>
+      <x>380</x>
+      <y>400</y>
+      <width>300</width>
+      <height>25</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+   </widget>
   </widget>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>429</width>
+     <width>671</width>
      <height>18</height>
     </rect>
    </property>

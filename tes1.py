@@ -10,10 +10,10 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
 
 
-class Ui_MainWindow(object):
-    def setupUi(self, MainWindow):
-        MainWindow.setObjectName("MainWindow")
-        self.centralwidget = QtWidgets.QWidget(MainWindow)
+class Ui_das(object):
+    def setupUi(self, das):
+        das.setObjectName("das")
+        self.centralwidget = QtWidgets.QWidget(das)
         self.centralwidget.setObjectName("centralwidget")
         self.gambar = QtWidgets.QLabel(self.centralwidget)
         self.gambar.setGeometry(QtCore.QRect(30, 80, 300, 300))
@@ -42,7 +42,7 @@ class Ui_MainWindow(object):
         self.spinBox.setGeometry(QtCore.QRect(30, 465, 42, 22))
         self.spinBox.setObjectName("spinBox")
         self.tombolNext = QtWidgets.QPushButton(self.centralwidget)
-        self.tombolNext.setGeometry(QtCore.QRect(490, 400, 60, 60))
+        self.tombolNext.setGeometry(QtCore.QRect(570, 470, 60, 60))
         self.tombolNext.setText("")
         self.tombolNext.setObjectName("tombolNext")
         self.gambar2 = QtWidgets.QLabel(self.centralwidget)
@@ -66,26 +66,34 @@ class Ui_MainWindow(object):
         self.label = QtWidgets.QLabel(self.centralwidget)
         self.label.setGeometry(QtCore.QRect(80, 460, 130, 30))
         self.label.setObjectName("label")
-        MainWindow.setCentralWidget(self.centralwidget)
-        self.menubar = QtWidgets.QMenuBar(MainWindow)
-        self.menubar.setGeometry(QtCore.QRect(0, 0, 429, 18))
+        self.tombolPrev = QtWidgets.QPushButton(self.centralwidget)
+        self.tombolPrev.setGeometry(QtCore.QRect(410, 470, 60, 60))
+        self.tombolPrev.setText("")
+        self.tombolPrev.setObjectName("tombolPrev")
+        self.similarity = QtWidgets.QLabel(self.centralwidget)
+        self.similarity.setGeometry(QtCore.QRect(380, 400, 300, 25))
+        self.similarity.setText("")
+        self.similarity.setObjectName("similarity")
+        das.setCentralWidget(self.centralwidget)
+        self.menubar = QtWidgets.QMenuBar(das)
+        self.menubar.setGeometry(QtCore.QRect(0, 0, 671, 18))
         self.menubar.setObjectName("menubar")
-        MainWindow.setMenuBar(self.menubar)
-        self.statusbar = QtWidgets.QStatusBar(MainWindow)
+        das.setMenuBar(self.menubar)
+        self.statusbar = QtWidgets.QStatusBar(das)
         self.statusbar.setObjectName("statusbar")
-        MainWindow.setStatusBar(self.statusbar)
+        das.setStatusBar(self.statusbar)
 
-        self.retranslateUi(MainWindow)
-        QtCore.QMetaObject.connectSlotsByName(MainWindow)
+        self.retranslateUi(das)
+        QtCore.QMetaObject.connectSlotsByName(das)
 
-    def retranslateUi(self, MainWindow):
+    def retranslateUi(self, das):
         _translate = QtCore.QCoreApplication.translate
-        MainWindow.setWindowTitle(_translate("MainWindow", "MainWindow"))
-        self.tombolLoad.setText(_translate("MainWindow", "Load"))
-        self.tombolFind.setText(_translate("MainWindow", "Find"))
-        self.tombolEuc.setText(_translate("MainWindow", "Euclidian Distance"))
-        self.tombolCosi.setText(_translate("MainWindow", "Cosine Similarity"))
-        self.query.setText(_translate("MainWindow", "Query"))
-        self.result.setText(_translate("MainWindow", "Result"))
-        self.judul.setText(_translate("MainWindow", "Face Recognition"))
-        self.label.setText(_translate("MainWindow", "Image(s)"))
+        das.setWindowTitle(_translate("das", "MainWindow"))
+        self.tombolLoad.setText(_translate("das", "Load"))
+        self.tombolFind.setText(_translate("das", "Find"))
+        self.tombolEuc.setText(_translate("das", "Euclidian Distance"))
+        self.tombolCosi.setText(_translate("das", "Cosine Similarity"))
+        self.query.setText(_translate("das", "Query"))
+        self.result.setText(_translate("das", "Result"))
+        self.judul.setText(_translate("das", "Face Recognition"))
+        self.label.setText(_translate("das", "Image(s)"))
