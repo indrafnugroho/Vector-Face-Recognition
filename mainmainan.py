@@ -49,10 +49,6 @@ class ApplicationWindow(QtWidgets.QMainWindow):
             self.ui.similarity.setText('Match %s%%' % round((1 - 0.1*self.match[self.iterate])*100,4))
         elif (self.option==2) :
             self.ui.similarity.setText('Match %s%%' % round(self.match[self.iterate]*100,4))
-        
-    def nextSlide(self):
-        if self.ui.tombolNext.clicked()==True:
-            self.ui.gambar2.setPixmap(QtGui.QPixmap([self]))
 
     def count(self):
         self.num = self.ui.spinBox.value()
