@@ -7,10 +7,8 @@ import scipy
 import scipy.spatial
 import imageio
 import pickle
-import random
 import os
 import matplotlib.pyplot as plt
-import math
 
 class ApplicationWindow(QtWidgets.QMainWindow):
     def __init__(self):
