@@ -17,53 +17,54 @@ import math
 class ApplicationWindow(QtWidgets.QMainWindow):
     def __init__(self):
         super(ApplicationWindow, self).__init__()
-        self.setFixedSize(700,525)
+        self.setFixedSize(700,575)
 
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
-        self.ui.tombolLoad.clicked.connect(lambda: self.load())
+        self.ui.tombolLoad.clicked.connect(lambda: self.loadkiri())
         self.ui.gambar.setPixmap(QtGui.QPixmap("a.png"))    
         self.ui.tombolCosi.toggled.connect(lambda: self.choose())
         self.ui.tombolEuc.toggled.connect(lambda: self.choose())
         self.ui.gambar2.setPixmap(QtGui.QPixmap("a.png"))
         self.ui.tombolNext.setIcon(QtGui.QIcon("next.png"))
 
-        self.ui.tombolFind.clicked.connect(lambda: self.run(self.option))
+        self.ui.tombolFind.clicked.connect(lambda: self.find(self.option, self.num))
         
-    def load(self):
+        self.ui.spinBox.valueChanged.connect(lambda: self.count())
+    def loadkiri(self):
         loader = QtWidgets.QFileDialog()
         self.name, _ = loader.getOpenFileName()
         self.ui.gambar.setPixmap(QtGui.QPixmap(self.name))
     
     def nextSlide(self):
         if self.ui.tombolNext.clicked()==True:
-            self.ui.gambar2.setPixmap(QtGui.QPixmap([self])
+            self.ui.gambar2.setPixmap(QtGui.QPixmap([self]))
 
-        
+    def count(self):
+        self.num = self.ui.spinBox.value()
     def choose(self):
         if self.ui.tombolCosi.isChecked()==True:
             self.option = 1
         if self.ui.tombolEuc.isChecked()==True:
             self.option = 2
             
-    def run(self, option, topn):
-        images_path = 'C:\Users\ASUS\Documents\Latihan\images\references\'
+    def find(self, option, topn):
+        images_path = 'images/references/'
         files = [self.name]
-   
-        #batch_extractor(images_path)
-
-        ma = Matcher('references.pck')
     
+        ma = Matcher('references.pck')
         for s in files:
+            print('Query image ==========================================')
             names, match = ma.match(s, option, topn)
-        print('Result images ========================================')
-        for i in range(topn):
-            names[i] = os.path.join(images_path, names[i])
-            if (option==1) :
-                print('Match %s' % (1 - match[i]))
-            elif (option==2) :
-                print('Match %s' % (match[i]))
-            show_img(names[i])
+            print('Result images ========================================')
+            for i in range(topn):
+                names[i] = os.path.join(images_path, names[i])
+                if (option==1) :
+                    print('Match %s%%' % round((1 - 0.1*match[i])*100,4))
+                elif (option==2) :
+                    print('Match %s%%' % round(match[i]*100,4))
+                show_img(names[i])
+
 
 class Matcher(object):
 
@@ -94,23 +95,15 @@ class Matcher(object):
                 distance[i][j] = (np.dot(self.matrix[i],v[j]) / (np.linalg.norm(self.matrix[i]) * np.linalg.norm(v[j])))
         return distance.reshape(-1)
     
-    """def cos_cdist(self, vector):
-        # getting cosine distance between search image and images database
-        v = vector.reshape(1, -1)
-        return scipy.spatial.distance.cdist(self.matrix, v, 'cosine').reshape(-1)"""
-
     def match(self, image_path, option, topn=5):
         features = extract_features(image_path)
-        print(option)
         # getting top 5 records
         if (option==1) :
             img_distances = self.euclidian_distance(features)
             nearest_ids = np.argsort(img_distances)[:topn].tolist()
-            print("A")
         elif (option==2) :
             img_distances = self.cosine_similarity(features)
             nearest_ids = np.argsort(img_distances)[::-1][:topn].tolist()
-            print("B")
         nearest_img_paths = self.names[nearest_ids].tolist()
 
         return nearest_img_paths, img_distances[nearest_ids].tolist()
